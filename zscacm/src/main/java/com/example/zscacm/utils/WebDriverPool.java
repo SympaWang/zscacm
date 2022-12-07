@@ -1,4 +1,4 @@
-package com.example.zscacm.WebMagicUtils;
+package com.example.zscacm.utils;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;

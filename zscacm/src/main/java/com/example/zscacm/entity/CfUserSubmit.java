@@ -13,23 +13,18 @@ import org.springframework.stereotype.Component;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CfUser {
+public class CfUserSubmit {
 
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
 
-    private String handle;
+    private Integer uid;
 
-    private Integer rating;
+    private Integer firstId;
 
-    private Integer maxRating;
+    private Integer secondId;
 
-    private String rank;
+    private Integer thirdId;
 
-    private String maxRank;
-
-    private String headerUrl;
-
-    private Integer solvedNum;
-
+    private Boolean status;
 }

@@ -23,7 +23,7 @@ public class CfContests {
 
     private Date beginTime;
 
-    private int relativeTime;
+    private long relativeTime;
 
 
 }

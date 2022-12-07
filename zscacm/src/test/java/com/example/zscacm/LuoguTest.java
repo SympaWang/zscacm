@@ -1,9 +1,8 @@
 package com.example.zscacm;
 
-import com.example.zscacm.WebMagicUtils.LuoguProcessor;
-import com.example.zscacm.WebMagicUtils.SeleniumDownloader;
+import com.example.zscacm.processor.LuoguProcessor;
+import com.example.zscacm.utils.SeleniumDownloader;
 import com.example.zscacm.entity.LuoguUser;
-import com.example.zscacm.mapper.LuoguUserMapper;
 import com.example.zscacm.service.LuoguService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,9 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import us.codecraft.webmagic.Spider;
-
-import java.util.Date;
-import java.util.Map;
 
 @SpringBootTest(classes = ZscacmApplication.class)
 @RunWith(SpringJUnit4ClassRunner.class)

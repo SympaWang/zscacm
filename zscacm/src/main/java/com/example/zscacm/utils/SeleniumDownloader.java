@@ -1,4 +1,4 @@
-package com.example.zscacm.WebMagicUtils;
+package com.example.zscacm.utils;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;

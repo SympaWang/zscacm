@@ -1,7 +1,8 @@
 package com.example.zscacm;
 
-import com.example.zscacm.WebMagicUtils.CFProcessor;
-import com.example.zscacm.WebMagicUtils.SeleniumDownloader;
+import com.example.zscacm.processor.CfProblemProcessor;
+import com.example.zscacm.utils.CfApiUtil;
+import com.example.zscacm.utils.SeleniumDownloader;
 import com.example.zscacm.mapper.CfProblemsMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,18 +12,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import us.codecraft.webmagic.Spider;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest(classes = ZscacmApplication.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CFTest {
 
     @Autowired
-    private CFProcessor cfProcessor;
+    private CfProblemProcessor cfProcessor;
 
     @Resource
     CfProblemsMapper cfProblemsMapper;
+
+    @Resource
+    private CfApiUtil cfApiUtil;
 
     @Test
     public void test() {
@@ -45,6 +47,11 @@ public class CFTest {
                 total = total_now;
             }
         }
+    }
+
+    @Test
+    public void testSubmits() {
+        System.out.println(cfApiUtil.getSubmitList("Sympa"));
 
     }
 }

@@ -1,13 +1,11 @@
 package com.example.zscacm.service;
 
-import com.example.zscacm.WebMagicUtils.LuoguProcessor;
 import com.example.zscacm.entity.LuoguUser;
 import com.example.zscacm.entity.LuoguUserProblem;
 import com.example.zscacm.mapper.LuoguUserMapper;
 import com.example.zscacm.mapper.LuoguUserProblemMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import us.codecraft.webmagic.pipeline.PageModelPipeline;
 
 import java.util.Date;
 import java.util.List;

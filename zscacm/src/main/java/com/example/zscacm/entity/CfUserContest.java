@@ -15,7 +15,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CfUserContests {
+public class CfUserContest {
 
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
