@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.zscacm.entity.CfProblems;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 public interface CfProblemsMapper extends BaseMapper<CfProblems> {
 
     @Select("select id, first_id, second_id, third_id, problem_name, difficulty, url, accept_num from cf_problems " +
@@ -12,4 +14,7 @@ public interface CfProblemsMapper extends BaseMapper<CfProblems> {
 
     @Select("select count(id) from cf_problems")
     public int selectCount();
+
+    @Select("select id, first_id, second_id, third_id, problem_name, difficulty, url, accept_num from cf_problems")
+    public List<CfProblems> selectList();
 }

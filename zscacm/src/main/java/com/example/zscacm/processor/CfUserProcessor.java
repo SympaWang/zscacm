@@ -27,11 +27,11 @@ public class CfUserProcessor implements PageProcessor {
         String url = page.getUrl().toString();
         String handle = url.substring(url.indexOf("profile/") + 8);
         CfUser user = cfService.selectUser(handle);
+
         if(user == null) {
             throw new RuntimeException("用户不存在！");
         }
 
-        user = cfApiUtil.getUserDetail(handle);
         String numPath = "//*[@id=\"pageContent\"]/div[4]/div/div[7]/div[1]/div[1]/div[1]/text()";
         String num = page.getHtml().xpath(numPath).toString(); //xxx problems
         num = num.substring(0, num.indexOf(" "));

@@ -9,3 +9,10 @@ spring:
     password: WANG2456
     url: jdbc:mysql://175.178.183.73:3306/web_magic_data?useUnicode=true&characterEncoding=utf-8
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      max-lifetime: 500000
+  security:
+    user:
+      name: sympa
+      password: 123456
+

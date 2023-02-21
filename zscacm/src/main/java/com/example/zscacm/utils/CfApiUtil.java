@@ -3,6 +3,7 @@ package com.example.zscacm.utils;
 import com.alibaba.fastjson.JSON;
 import com.example.zscacm.entity.CfContests;
 import com.example.zscacm.entity.CfUser;
+import com.example.zscacm.entity.CfUserContest;
 import com.example.zscacm.entity.CfUserSubmit;
 import com.example.zscacm.service.CfService;
 import okhttp3.OkHttpClient;
@@ -12,10 +13,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 public class CfApiUtil {
@@ -81,16 +81,25 @@ public class CfApiUtil {
 
             String result = JSON.parseObject(str).get("result").toString();
             List<HashMap> list = JSON.parseArray(result,HashMap.class);
-
             List<CfContests> contestList = new ArrayList<>();
 
             for(HashMap info : list) {
                 int id = (int) info.get("id");
                 String name = (String) info.get("name");
                 int durationSeconds = (int) info.get("durationSeconds");
-                long startSeconds = (long) info.get("startTimeSeconds");
-                Date beginTime = new Date(Long.parseLong(String.valueOf(startSeconds)));
-                long relativeSeconds = (long) info.get("relativeTimeSeconds");
+                int startSeconds = (int) info.get("startTimeSeconds");
+                int relativeSeconds = (int) info.get("relativeTimeSeconds");
+
+                Date beginTime = null;
+                String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA)
+                        .format(Long.parseLong(String.valueOf(startSeconds)) * 1000);
+                SimpleDateFormat formater = new SimpleDateFormat();
+                formater.applyPattern("yyyy-MM-dd HH:mm:ss");
+                try {
+                    beginTime = formater.parse(dateStr);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
                 CfContests cfContests = CfContests.builder().id(id).name(name).durationSeconds(durationSeconds).
                         beginTime(beginTime).relativeTime(relativeSeconds).build();
@@ -105,7 +114,6 @@ public class CfApiUtil {
 
     //获取用户提交
     public List<CfUserSubmit> getSubmitList(String handle) {
-
         String url = "https://codeforces.com/api/user.status?handle=" + handle;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).get().build();
@@ -123,6 +131,7 @@ public class CfApiUtil {
             }
 
             String result = JSON.parseObject(str).get("result").toString();
+
             List<HashMap> list = JSON.parseArray(result,HashMap.class);
 
             List<CfUserSubmit> userSubmits = new ArrayList<>();
@@ -138,6 +147,8 @@ public class CfApiUtil {
                 boolean subStatus = verdict.equals("OK");
 
                 int id = cfService.selectUserId(handle);
+                System.out.println(handle);
+
 
                 CfUserSubmit userSubmit = CfUserSubmit.builder().uid(id).firstId(firstId).
                         secondId(secondId).thirdId(thirdId).status(subStatus).build();
@@ -145,6 +156,57 @@ public class CfApiUtil {
             }
 
             return userSubmits;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //获取用户比赛列表
+    public List<CfUserContest> getUserContest(String handle) {
+        String url = "https://codeforces.com/api/user.rating?handle=" + handle;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).get().build();
+        try (Response response = client.newCall(request).execute()) {
+            String str = response.body() != null ? response.body().string() : null;
+
+            if(str == null) {
+                throw new RuntimeException("请求失败！");
+            }
+
+            String status = JSON.parseObject(str).get("status").toString();
+            if(!status.equals("OK")) {
+                throw new RuntimeException("获取用户比赛列表失败！");
+            }
+
+            String result = JSON.parseObject(str).get("result").toString();
+
+            List<HashMap> list = JSON.parseArray(result,HashMap.class);
+
+            List<CfUserContest> userContests = new ArrayList<>();
+            for(HashMap contest : list) {
+                int contestId = (int)contest.get("contestId");
+                int rank = (int)contest.get("rank");
+                int ratingUpdateTimeSeconds = (int)contest.get("ratingUpdateTimeSeconds");
+                int oldRating = (int)contest.get("oldRating");
+                int newRating = (int)contest.get("newRating");
+
+                Date ratingTime = null;
+                String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA)
+                        .format(Long.parseLong(String.valueOf(ratingUpdateTimeSeconds)) * 1000);
+                SimpleDateFormat formater = new SimpleDateFormat();
+                formater.applyPattern("yyyy-MM-dd HH:mm:ss");
+                try {
+                    ratingTime = formater.parse(dateStr);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                CfUserContest userContest = CfUserContest.builder().contestId(contestId).rank(rank).ratingTime(ratingTime)
+                        .handle(handle).oldRating(oldRating).newRating(newRating).build();
+                userContests.add(userContest);
+            }
+            return userContests;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
