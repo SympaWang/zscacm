@@ -8,12 +8,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+
 @Data
 @Component
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CfUser {
+public class CfUser implements Serializable {
 
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;

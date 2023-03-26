@@ -10,4 +10,7 @@ public interface LuoguUserMapper extends BaseMapper<LuoguUser> {
 
     @Select("select uid, lgid, total_problems, add_time from luogu_user where lgid = #{lgid}")
     public LuoguUser selectByLgid(int lgid);
+
+    @Select("select total_problems from luogu_user where lgid = #{lgid}")
+    public Integer selectTotalProblemByLgid(int lgid);
 }

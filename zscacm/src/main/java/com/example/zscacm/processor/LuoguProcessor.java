@@ -27,12 +27,6 @@ public class LuoguProcessor implements PageProcessor {
 
         String totalProblemsPath = "//*[@id=\"app\"]/div[2]/main/div/div[1]/div[2]/div[2]/div/div[4]/a/span[2]/text()";
         Integer totalProblems = Integer.parseInt(page.getHtml().xpath(totalProblemsPath).toString());
-        for(int i = 1; i <= 8; i++) {
-            String numPath = "//*[@id=\"app\"]/div[2]/main/div/div[2]/section[1]/div/div[1]/div[" + i + "]/span[2]/text()";
-            String numstr = page.getHtml().xpath(numPath).toString();
-            numstr = numstr.substring(0, numstr.length() - 1);
-            num.add(Integer.parseInt(numstr));
-        }
         page.putField("num", num);
         page.putField("totalProblems", totalProblems);
 

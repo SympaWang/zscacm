@@ -8,23 +8,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Date;
+
 @Data
 @Component
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CfUserSubmit {
+public class VjUser implements Serializable {
 
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
 
-    private Integer uid;
+    private String VjName;
 
-    private Integer firstId;
+    private Integer weekProblem;
 
-    private Integer secondId;
+    private Integer monthProblem;
 
-    private Integer thirdId;
+    private Integer totalProblem;
 
-    private Boolean status;
+    private Date addTime;
 }

@@ -1,6 +1,7 @@
 package com.example.zscacm;
 
 import com.example.zscacm.processor.LuoguProcessor;
+import com.example.zscacm.processor.VJProcessor;
 import com.example.zscacm.utils.SeleniumDownloader;
 import com.example.zscacm.entity.LuoguUser;
 import com.example.zscacm.service.LuoguService;
@@ -21,6 +22,9 @@ public class LuoguTest {
     @Autowired
     private LuoguProcessor luoguProcessor;
 
+    @Autowired
+    private VJProcessor vjProcessor;
+
     @Test
     public void testInsert() {
         int lgid = 262041;
@@ -30,6 +34,17 @@ public class LuoguTest {
         }
         String url = "https://www.luogu.com.cn/user/" + lgid + "#practice";
         Spider spider =  Spider.create(luoguProcessor);
+        spider.addUrl(url)
+                .setDownloader(new SeleniumDownloader("C:\\Program Files (x86)\\chromedriver.exe"))
+                .thread(5)
+                .run();
+    }
+
+    @Test
+    public void VjTest() {
+        String vjName = "2019030006487";
+        String url = "https://vjudge.csgrandeur.cn/user/" + vjName;
+        Spider spider =  Spider.create(vjProcessor);
         spider.addUrl(url)
                 .setDownloader(new SeleniumDownloader("C:\\Program Files (x86)\\chromedriver.exe"))
                 .thread(5)

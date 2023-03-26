@@ -25,6 +25,10 @@ public class LuoguService {
         return user;
     }
 
+    public Integer selectTotalProblemByLgid(int lgid) {
+        return luoguUserMapper.selectTotalProblemByLgid(lgid);
+    }
+
     public int addUser(int lgid) {
         LuoguUser user = LuoguUser.builder().lgid(lgid).addTime(new Date()).build();
         luoguUserMapper.insert(user);
@@ -45,6 +49,10 @@ public class LuoguService {
             userProblem.setProblemNum(problemNum);
             luoguUserProblemMapper.updateById(userProblem);
         }
+    }
+
+    public List<LuoguUserProblem> selectSolvedByLgid(int lgid) {
+        return luoguUserProblemMapper.selectProblemByLgid(lgid);
     }
 
 }

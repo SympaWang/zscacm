@@ -4,8 +4,8 @@ import com.example.zscacm.entity.CfContests;
 import com.example.zscacm.entity.CfUser;
 import com.example.zscacm.entity.CfUserContest;
 import com.example.zscacm.processor.CfProblemProcessor;
-import com.example.zscacm.processor.CfSubmitProcessor;
 import com.example.zscacm.processor.CfUserProcessor;
+import com.example.zscacm.producer.KafkaProducer;
 import com.example.zscacm.service.CfService;
 import com.example.zscacm.utils.CfApiUtil;
 import com.example.zscacm.utils.SeleniumDownloader;
@@ -18,6 +18,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import us.codecraft.webmagic.Spider;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @SpringBootTest(classes = ZscacmApplication.class)
@@ -38,6 +43,9 @@ public class CFTest {
 
     @Resource
     private CfService cfService;
+
+    @Resource
+    private KafkaProducer kafkaProducer;
 
     @Test
     public void test() {
@@ -104,5 +112,31 @@ public class CFTest {
     public void getFutureContests() {
         List<CfContests> list = cfService.getFutureContests();
         System.out.println(list);
+    }
+
+    @Test
+    public void getUserSubmit() {
+        //List<CfUserSubmit> submits = cfApiUtil.getSubmitList("sympa");
+        //System.out.println(submits);
+    }
+
+    @Test
+    public void getTime() {
+        LocalDateTime today_start = LocalDateTime.of(LocalDate.of(2023, 3, 16), LocalTime.MIN);//当天零点
+        //获取当天结束时间
+        LocalDateTime today_end = LocalDateTime.of(LocalDate.of(2023, 3, 16), LocalTime.MAX);//当天24点
+
+        String td_st_str = today_start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String td_ed_str = today_end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        //获取秒数  10位
+        long start_time = today_start.toInstant(ZoneOffset.ofHours(8)).getEpochSecond();
+        long end_time = today_end.toInstant(ZoneOffset.ofHours(8)).getEpochSecond();
+
+
+        System.out.println(start_time);
+        System.out.println(end_time);
+
+
     }
 }

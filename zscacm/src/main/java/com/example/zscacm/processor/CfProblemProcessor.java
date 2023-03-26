@@ -78,19 +78,24 @@ public class CfProblemProcessor implements PageProcessor {
             List<String> types = page.getHtml().xpath(typePath).all();
             logger.info(types.toString());
 
-            CfProblems exist = cfService.selectProblemByIds(firstId, secondId, thirdId);
-            if(exist != null) {
-                continue;
-            }
-
             CfProblems cfProblems = CfProblems.builder().firstId(firstId).secondId(secondId).thirdId(thirdId)
                     .problemName(name).difficulty(dif).url(url).acceptNum(acceptNum).build();
-            cfService.addProblem(cfProblems);
 
-            for(String type : types) {
-                cfService.addProblemType(firstId, secondId, thirdId, type);
+            CfProblems exist = cfService.selectProblemByIds(firstId, secondId, thirdId);
+            if(exist != null) {
+                if(exist.getDifficulty() == dif) {
+                    continue;
+                }
+                cfService.updateDifById(dif, firstId, secondId, thirdId);
+            } else {
+                cfService.addProblem(cfProblems);
+                for(String type : types) {
+                    cfService.addProblemType(firstId, secondId, thirdId, type);
+                }
             }
+
         }
+
     }
 
     @Override

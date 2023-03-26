@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.example.zscacm.entity.CfContests;
 import com.example.zscacm.entity.CfUser;
 import com.example.zscacm.entity.CfUserContest;
-import com.example.zscacm.entity.CfUserSubmit;
+import com.example.zscacm.entity.CfUserSubmits;
 import com.example.zscacm.service.CfService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -113,8 +113,7 @@ public class CfApiUtil {
     }
 
     //获取用户提交
-    public List<CfUserSubmit> getSubmitList(String handle) {
-        String url = "https://codeforces.com/api/user.status?handle=" + handle;
+    public List<CfUserSubmits> getSubmitList(String url, String handle) {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).get().build();
 
@@ -134,7 +133,7 @@ public class CfApiUtil {
 
             List<HashMap> list = JSON.parseArray(result,HashMap.class);
 
-            List<CfUserSubmit> userSubmits = new ArrayList<>();
+            List<CfUserSubmits> userSubmits = new ArrayList<>();
 
             for(HashMap submit : list) {
                 HashMap problem = JSON.parseObject(submit.get("problem").toString(), HashMap.class);
@@ -144,14 +143,12 @@ public class CfApiUtil {
                 int secondId = index.charAt(0) - 'A' + 1;
                 int thirdId = index.length() == 1 ? 0 : index.charAt(1);
                 String verdict = submit.get("verdict").toString();
-                boolean subStatus = verdict.equals("OK");
+                int creationTime = (int) submit.get("creationTimeSeconds");
 
                 int id = cfService.selectUserId(handle);
-                System.out.println(handle);
 
-
-                CfUserSubmit userSubmit = CfUserSubmit.builder().uid(id).firstId(firstId).
-                        secondId(secondId).thirdId(thirdId).status(subStatus).build();
+                CfUserSubmits userSubmit = CfUserSubmits.builder().uid(id).firstId(firstId).
+                        secondId(secondId).thirdId(thirdId).status(verdict).creationTime(creationTime).build();
                 userSubmits.add(userSubmit);
             }
 

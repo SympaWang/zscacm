@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 public class CfContestsController {
 
     @Resource
@@ -18,7 +19,11 @@ public class CfContestsController {
 
     @GetMapping("/FutureContests")
     public List<CfContests> getFutureContests() {
-        List<CfContests> list = cfService.getFutureContests();
-        return list;
+        return cfService.getFutureContests();
+    }
+
+    @GetMapping("/endContests")
+    public List<CfContests> getContests() {
+        return cfService.selectEndContests();
     }
 }
