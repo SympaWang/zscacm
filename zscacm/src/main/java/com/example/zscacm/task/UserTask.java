@@ -7,6 +7,7 @@ import com.example.zscacm.entity.SysUser;
 import com.example.zscacm.service.AttendanceService;
 import com.example.zscacm.service.UserService;
 import okhttp3.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -29,14 +30,13 @@ public class UserTask {
     @Resource
     AttendanceService attendanceService;
 
-
+    @Scheduled(cron = "0 0 22 * * ? ")
     public void attendanceTask() {
-
         List<SysUser> userList = userService.selectUser();
 
         for(SysUser user : userList) {
 
-            String username = user.getUsername();
+            String username = user.getPyName();
 
 
             String url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ww16aa84a335867100&corpsecret=UafZAssYlzzCRIdW9umo5b29A55mlet5Fmj_muXe710";
@@ -94,10 +94,14 @@ public class UserTask {
 
                 if(list != null || list.size() != 0) {
 
-                    int beginTime = (int) list.get(1).get("checkin_time");
-                    int endTime = (int) list.get(2).get("checkin_time");
-                    String status1 = (String) list.get(1).get("exception_type");
-                    String status2 = (String) list.get(2).get("exception_type");
+                    long beginTime = 1000L *  (int) list.get(0).get("checkin_time");
+                    long endTime = 1000L *  (int) list.get(1).get("checkin_time");
+                    String status1 = (String) list.get(0).get("exception_type");
+                    String status2 = (String) list.get(1).get("exception_type");
+
+                    if(status1.isBlank()) {
+                        status1 = "正常";
+                    }
 
                     Date begin = new Date(beginTime);
                     Date end = new Date(endTime);

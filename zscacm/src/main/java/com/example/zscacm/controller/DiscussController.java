@@ -25,7 +25,6 @@ public class DiscussController {
 
     @PostMapping("/addDiscuss")
     public ResponseResult addDiscuss(@RequestBody Map<String,String> map) {
-        System.out.println(map);
         String username = map.get("username");
 
         Integer id = userService.selectIdByName(username);

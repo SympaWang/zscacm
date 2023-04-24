@@ -32,7 +32,7 @@ public class CfUserProcessor implements PageProcessor {
             throw new RuntimeException("用户不存在！");
         }
 
-        String numPath = "//*[@id=\"pageContent\"]/div[4]/div/div[7]/div[1]/div[1]/div[1]/text()";
+        String numPath = "//*[@id=\"pageContent\"]/div[4]/div/div[3]/div[1]/div[1]/div[1]/text()";
         String num = page.getHtml().xpath(numPath).toString(); //xxx problems
         num = num.substring(0, num.indexOf(" "));
         user.setSolvedNum(Integer.parseInt(num));

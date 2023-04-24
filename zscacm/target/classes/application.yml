@@ -43,3 +43,8 @@ spring:
       time-to-live: 10s
   kafka:
     bootstrap-servers: http://175.178.183.73:9092
+cos:
+  secretId: AKIDypUt42kD9qGSXYNG0Vt50iDTWO3RdJp7		# 密钥id
+  secretKey: 6xYuXx99wXv89u1uY0GUYRAlAVfhcMtB		# 密钥key
+  bucketName: zscacm-1302342664		# 需要使用的存储桶名称
+  region: ap-guangzhou			# 存储桶地域

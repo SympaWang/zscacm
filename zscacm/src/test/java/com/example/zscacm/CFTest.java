@@ -50,24 +50,17 @@ public class CFTest {
     @Test
     public void test() {
 
-        int total = cfProblemsMapper.selectCount();
+        int total = cfService.selectProblemCount();
         Spider spider =  Spider.create(cfProcessor);
 
-        for(int i = 1; i <= 83; i++) {
+        for(int i = 1; i <= 25; i++) {
             String url = "https://codeforces.com/problemset/page/" + i;
             spider.addUrl(url)
                     .setDownloader(new SeleniumDownloader("C:\\Program Files (x86)\\chromedriver.exe"))
                     .thread(5)
                     .run();
-
-            int total_now = cfProblemsMapper.selectCount();
-            if(total == total_now) {
-                System.out.println("第" + i + "页未添加");
-                break;
-            } else {
-                total = total_now;
-            }
         }
+        System.out.println("cf问题添加完毕");
     }
 
     @Test
@@ -85,7 +78,7 @@ public class CFTest {
         Spider spider =  Spider.create(cfUserProcessor);
         String url = "https://codeforces.com/profile/Sympa";
         spider.addUrl(url)
-                .setDownloader(new SeleniumDownloader("C:\\Program Files (x86)\\chromedriver.exe"))
+                .setDownloader(new SeleniumDownloader("C:\\Program Files (x86)\\Tencent\\chromedriver.exe"))
                 .thread(5)
                 .run();
 
@@ -97,7 +90,8 @@ public class CFTest {
     public void testContest() {
         List<CfContests> list = cfApiUtil.getContestList();
         int addNum = cfService.addContest(list);
-        System.out.println(addNum);
+
+        System.out.println("新增了" + addNum + "场比赛");
     }
 
     @Test

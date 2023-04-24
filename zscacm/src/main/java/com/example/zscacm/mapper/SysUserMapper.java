@@ -27,4 +27,8 @@ public interface SysUserMapper  extends BaseMapper<SysUser> {
 
     @Select("select username from sys_user where id=#{id}")
     String selectNameById(int id);
+
+
+    @Select("select distinct 1 from sys_user")
+    int selectHeartbeat();
 }

@@ -30,7 +30,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Autowired
     private RedisCache redisCache;
 
-    @SneakyThrows
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -57,7 +56,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             throw new AccessDeniedException("用户未登录");
         }
         //存入SecurityContextHolder
-        //TODO 获取权限信息封装到Authentication中
+        //获取权限信息封装到Authentication中
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginUser,null,null);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);

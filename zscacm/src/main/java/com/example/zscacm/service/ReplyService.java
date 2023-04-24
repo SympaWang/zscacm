@@ -28,7 +28,7 @@ public class ReplyService {
             Message message = Message.builder().fromId(reply.getFromId())
                     .toId(reply.getToId()).targetId(reply.getReplyId()).createTime(reply.getCreateTime()).status(1).type(1).build();
 
-            kafkaProducer.sendMessage1(message);
+            kafkaProducer.sendReply(message);
         }
 
         return result;

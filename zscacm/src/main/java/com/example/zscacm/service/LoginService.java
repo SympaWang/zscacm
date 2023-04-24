@@ -42,6 +42,7 @@ public class LoginService {
         map.put("token",jwt);
         map.put("userType", loginUser.getUser().getUserType());
         map.put("uid", loginUser.getUser().getId());
+        map.put("username", loginUser.getUser().getUsername());
 
         return new ResponseResult(200,"登陆成功", map);
     }

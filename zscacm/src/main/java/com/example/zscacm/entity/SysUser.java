@@ -24,6 +24,8 @@ public class SysUser implements Serializable {
 
     private String username;
 
+    private String pyName;
+
     private String studentNum;
 
     private String password;

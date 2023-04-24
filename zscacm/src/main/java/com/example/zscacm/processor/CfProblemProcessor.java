@@ -1,7 +1,10 @@
 package com.example.zscacm.processor;
 
 import com.example.zscacm.entity.CfProblems;
+import com.example.zscacm.producer.KafkaProducer;
 import com.example.zscacm.service.CfService;
+import com.example.zscacm.utils.RedisCache;
+import com.shapesecurity.salvation2.Values.Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -11,6 +14,7 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -22,6 +26,12 @@ public class CfProblemProcessor implements PageProcessor {
 
     @Resource
     private CfService cfService;
+
+    @Resource
+    private RedisCache redisCache;
+
+    @Resource
+    private KafkaProducer kafkaProducer;
 
     @Override
     @Transactional
@@ -38,6 +48,7 @@ public class CfProblemProcessor implements PageProcessor {
         List<String> names = page.getHtml().xpath(namePath).all();
         logger.info(names.toString());
 
+        redisCache.deleteObject("cfProblemList");
         for(int i = 0; i < ids.size(); i++) {
 
             String id = ids.get(i).replace(" ", "");;
@@ -81,18 +92,10 @@ public class CfProblemProcessor implements PageProcessor {
             CfProblems cfProblems = CfProblems.builder().firstId(firstId).secondId(secondId).thirdId(thirdId)
                     .problemName(name).difficulty(dif).url(url).acceptNum(acceptNum).build();
 
-            CfProblems exist = cfService.selectProblemByIds(firstId, secondId, thirdId);
-            if(exist != null) {
-                if(exist.getDifficulty() == dif) {
-                    continue;
-                }
-                cfService.updateDifById(dif, firstId, secondId, thirdId);
-            } else {
-                cfService.addProblem(cfProblems);
-                for(String type : types) {
-                    cfService.addProblemType(firstId, secondId, thirdId, type);
-                }
-            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("problem", cfProblems);
+            map.put("types", types);
+            kafkaProducer.sendCfProblem(map);
 
         }
 

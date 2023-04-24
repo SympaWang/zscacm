@@ -42,7 +42,7 @@ public class UserTest {
 
         for(SysUser user : userList) {
 
-            String username = user.getUsername();
+            String username = user.getPyName();
 
 
             String url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ww16aa84a335867100&corpsecret=UafZAssYlzzCRIdW9umo5b29A55mlet5Fmj_muXe710";
@@ -81,7 +81,7 @@ public class UserTest {
                 jsonObject.put("opencheckindatatype", 1);
                 jsonObject.put("starttime", start_time);
                 jsonObject.put("endtime", end_time);
-                jsonObject.put("useridlist", "wangludan");
+                jsonObject.put("useridlist", username);
 
                 RequestBody formBody = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), jsonObject.toString());
 
@@ -100,10 +100,14 @@ public class UserTest {
 
                 if(list != null || list.size() != 0) {
 
-                    int beginTime = (int) list.get(1).get("checkin_time");
-                    int endTime = (int) list.get(2).get("checkin_time");
-                    String status1 = (String) list.get(1).get("exception_type");
-                    String status2 = (String) list.get(2).get("exception_type");
+                    long beginTime = 1000L *  (int) list.get(0).get("checkin_time");
+                    long endTime = 1000L *  (int) list.get(1).get("checkin_time");
+                    String status1 = (String) list.get(0).get("exception_type");
+                    String status2 = (String) list.get(1).get("exception_type");
+
+                    if(status1.isBlank()) {
+                        status1 = "正常";
+                    }
 
                     Date begin = new Date(beginTime);
                     Date end = new Date(endTime);
@@ -120,5 +124,21 @@ public class UserTest {
 
         }
 
+    }
+
+    @Test
+    public void time() {
+        System.out.println(LocalDate.now());
+        LocalDateTime today_start = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);//当天零点
+        //获取当天结束时间
+        LocalDateTime today_end = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);//当天24点
+
+        String td_st_str = today_start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String td_ed_str = today_end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        //获取秒数  10位
+        long start_time = today_start.toInstant(ZoneOffset.ofHours(8)).getEpochSecond();
+        long end_time = today_end.toInstant(ZoneOffset.ofHours(8)).getEpochSecond();
+        System.out.println(start_time);
     }
 }

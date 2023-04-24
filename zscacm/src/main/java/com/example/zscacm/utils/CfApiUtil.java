@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class CfApiUtil {
@@ -26,7 +27,12 @@ public class CfApiUtil {
     //通过用户名获取用户信息，返回
     public CfUser getUserDetail(String handle) {
         String url = "https://codeforces.com/api/user.info?handles=" + handle;
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder().
+                connectTimeout(30, TimeUnit.SECONDS)
+                .pingInterval(5, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
 
         Request request = new Request.Builder().url(url).get().build();
         try (Response response = client.newCall(request).execute()) {
@@ -64,7 +70,12 @@ public class CfApiUtil {
     //获取比赛列表
     public List<CfContests> getContestList() {
         String url = "https://codeforces.com/api/contest.list";
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder().
+                connectTimeout(30, TimeUnit.SECONDS)
+                .pingInterval(5, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
 
         Request request = new Request.Builder().url(url).get().build();
         try (Response response = client.newCall(request).execute()) {
@@ -114,7 +125,13 @@ public class CfApiUtil {
 
     //获取用户提交
     public List<CfUserSubmits> getSubmitList(String url, String handle) {
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder().
+                connectTimeout(30, TimeUnit.SECONDS)
+                .pingInterval(5, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
+
         Request request = new Request.Builder().url(url).get().build();
 
         try (Response response = client.newCall(request).execute()) {
@@ -124,6 +141,7 @@ public class CfApiUtil {
                 throw new RuntimeException("请求失败！");
             }
 
+            System.out.println(str);
             String status = JSON.parseObject(str).get("status").toString();
             if(!status.equals("OK")) {
                 throw new RuntimeException("获取提交列表失败！");
@@ -162,7 +180,12 @@ public class CfApiUtil {
     //获取用户比赛列表
     public List<CfUserContest> getUserContest(String handle) {
         String url = "https://codeforces.com/api/user.rating?handle=" + handle;
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder().
+                connectTimeout(30, TimeUnit.SECONDS)
+                .pingInterval(5, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
         Request request = new Request.Builder().url(url).get().build();
         try (Response response = client.newCall(request).execute()) {
             String str = response.body() != null ? response.body().string() : null;

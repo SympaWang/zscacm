@@ -7,13 +7,13 @@ import com.example.zscacm.service.LuoguService;
 import com.example.zscacm.service.UserService;
 import com.example.zscacm.service.VjService;
 import com.example.zscacm.utils.ResponseResult;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import static java.lang.Math.min;
 
@@ -32,6 +32,9 @@ public class CfProblemsController {
 
     @Resource
     private VjService vjService;
+
+    @Resource
+    private Executor threadPoolExecutor;
 
     public HashMap<String, String> initMap() {
         HashMap<String, String> typeMap = new HashMap();
@@ -96,13 +99,18 @@ public class CfProblemsController {
         //查询用户信息
         if(sysUser != null) {
             handle = userService.selectHandleByName(sysUser);
-             cfId = cfService.selectUserId(handle);
+            if(handle == null) {
+                sysUser = null;
+            } else {
+                cfId = cfService.selectUserId(handle);
+            }
         }
 
         //查询所选年级的解题信息
         if(grade != null) {
             List<SysUser> gradeUser = userService.selectUserByGrade(grade);
             for(SysUser user : gradeUser) {
+                if(user.getHandle() == null) continue;
                 List<CfProblemIds> problemsId = cfService.selectUserSubmitIds(user.getId());
                 gradeProblems.addAll(problemsId);
             }
@@ -138,7 +146,7 @@ public class CfProblemsController {
         List<CfProblems> problemsList = new ArrayList<>();
 
         //查找题目列表
-        if(submited == 1) {
+        if(submited == 1 && cfId != null) {
             List<CfUserSubmits> userSubmits = cfService.selectUserSubmit(cfId);
             for(CfUserSubmits userSubmit : userSubmits) {
                 CfProblems problem = cfService.selectProblemByIds(
@@ -282,30 +290,46 @@ public class CfProblemsController {
             resultMap.put("name", user.getUsername());
             resultMap.put("grade", user.getGrade());
 
-            int lgProblem = luoguService.selectTotalProblemByLgid(user.getLgid());
-            int vjProblem = vjService.selectTotalProblemByName(user.getVjName());
-            CfUser cfUser = cfService.selectUser(user.getHandle());
-            int cfProblem = cfUser.getSolvedNum();
-            resultMap.put("solved", lgProblem + vjProblem + cfProblem);
-            resultMap.put("rating", cfUser.getRating());
-            resultMap.put("maxRating", cfUser.getMaxRating());
+            int lgProblem = 0;
+            if(user.getLgid() != null) {
+                lgProblem = luoguService.selectTotalProblemByLgid(user.getLgid());
+            }
 
-            int cfContestNum = cfService.selectUserContestNum(user.getHandle());
+            int vjProblem = 0;
+            if(user.getVjName() != null) {
+                vjProblem = vjService.selectTotalProblemByName(user.getVjName());
+            }
+
+            CfUser cfUser = null;
+            int cfProblem = 0;
+            int cfContestNum = 0;
+            if(user.getHandle() != null) {
+                cfUser = cfService.selectUser(user.getHandle());
+                cfProblem = cfUser.getSolvedNum();
+                cfContestNum = cfService.selectUserContestNum(user.getHandle());
+            }
+
+            resultMap.put("solved", lgProblem + vjProblem + cfProblem);
+            resultMap.put("rating", (cfUser==null || cfUser.getRating() == null) ? 0 : cfUser.getRating());
+            resultMap.put("maxRating", (cfUser==null || cfUser.getMaxRating() == null) ? 0 : cfUser.getMaxRating());
+
             resultMap.put("contestNum", cfContestNum);
 
             users.add(resultMap);
+
         }
 
         return new ResponseResult(200, "查询成功", users);
     }
 
-    public synchronized List<HashMap<String, Object>> Thread(List<CfProblemIds> list, int nThread, int cfId, String sysUser) throws InterruptedException {
+    public synchronized List<HashMap<String, Object>> Thread(List<CfProblemIds> list, int nThread, Integer cfId, String sysUser) throws InterruptedException {
 
         if (CollectionUtils.isEmpty(list) || nThread <= 0 || CollectionUtils.isEmpty(list)) {
             return null;
         }
         CountDownLatch latch = new CountDownLatch(list.size());//创建一个计数器（大小为当前数组的大小，确保所有执行完主线程才结束）
-        ExecutorService pool = Executors.newFixedThreadPool(nThread);//创建一个固定的线程池
+
+        Executor pool = threadPoolExecutor;//创建一个固定的线程池
 
         List<HashMap<String, Object>> result = new ArrayList<>();
         for(CfProblemIds id : list) {
@@ -343,7 +367,6 @@ public class CfProblemsController {
         }
         //等待计数器归零
         latch.await();
-        pool.shutdown();
 
         return result;
     }

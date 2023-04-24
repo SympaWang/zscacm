@@ -12,13 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 @RestController
 public class AttendanceController {
@@ -36,8 +31,7 @@ public class AttendanceController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         Date day = sdf.parse(date);
-
-        LocalDateTime today_start = LocalDateTime.of(LocalDate.of(day.getYear(), day.getMonth(), day.getDay()), LocalTime.MIN);//当天零点
+        LocalDateTime today_start = LocalDateTime.of(day.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), LocalTime.MIN);//当天零点
         int start_time = (int) today_start.toInstant(ZoneOffset.ofHours(8)).getEpochSecond();
 
         List<SysUser> userList;
@@ -48,13 +42,20 @@ public class AttendanceController {
             userList = userService.selectUserByGrade(grade);
         }
 
-        List<Attendance> result = new ArrayList<>();
+        List<Map<String, Object>> result = new ArrayList<>();
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         if(userList != null) {
             for(SysUser user : userList) {
                 Attendance attendance = attendanceService.selectAttendance(user.getId(), start_time);
                 if(attendance != null) {
-                    result.add(attendance);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("username", user.getUsername());
+                    map.put("startTime", f.format(attendance.getStartTime()));
+                    map.put("endTime", f.format(attendance.getEndTime()));
+                    map.put("status", attendance.getStatus());
+
+                    result.add(map);
                 }
             }
         }

@@ -32,7 +32,7 @@ public class CfTask {
     @Autowired
     private UserService userService;
 
-    @Scheduled(cron = "0 0 5 * * ? ")
+    @Scheduled(cron = "0 34 13 * * ? ")
     public void CfProblemTask(){
         int total = cfService.selectProblemCount();
         Spider spider =  Spider.create(cfProcessor);
@@ -47,14 +47,14 @@ public class CfTask {
         System.out.println("cf问题添加完毕");
     }
 
-    @Scheduled(cron = "0 0 6 * * ? ")
+    @Scheduled(cron = "0 21 12 * * ? ")
     public void cfContestTask() {
         List<CfContests> list = cfApiUtil.getContestList();
         int addNum = cfService.addContest(list);
         System.out.println("新增了" + addNum + "场比赛");
     }
 
-    @Scheduled(cron = "0 0 7 * * ? ")
+    @Scheduled(cron = "0 0 12 * * ? ")
     public void cfUserTask() {
         List<SysUser> userList = userService.selectUser();
 
@@ -85,9 +85,11 @@ public class CfTask {
         List<SysUser> userList = userService.selectUser();
         for(SysUser user : userList) {
             String handle = user.getHandle();
+            if(handle == null) continue;
+
             Integer cfId = cfService.selectUserId(handle);
 
-            for(int page = 1; ; page++) {
+            for(int page = 1; page <= 5; page++) {
                 int from = (page - 1) * 25 + 1;
                 String url = "https://codeforces.com/api/user.status?handle=" + handle + "&from=" + from
                         + "&count=25";

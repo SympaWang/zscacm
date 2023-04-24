@@ -26,7 +26,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         SysUser user = sysUserMapper.selectOne(wrapper);
         //如果查询不到数据就通过抛出异常来给出提示
         if(Objects.isNull(user)){
-            throw new RuntimeException("用户名或密码错误");
+            LambdaQueryWrapper<SysUser> secondWrapper = new LambdaQueryWrapper<>();
+            secondWrapper.eq(SysUser::getEmail, username);
+            user = sysUserMapper.selectOne(secondWrapper);
+            if(Objects.isNull(user)){
+                throw new RuntimeException("用户名或密码错误");
+            }
         }
         //TODO 根据用户查询权限信息 添加到LoginUser中
 

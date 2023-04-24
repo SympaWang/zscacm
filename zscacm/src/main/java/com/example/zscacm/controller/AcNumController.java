@@ -48,6 +48,7 @@ public class AcNumController {
 
         for(SysUser sysUser : cfUserList) {
             Map<String, Object> userMap = new HashMap<>();
+            if(sysUser.getHandle() == null) continue;
 
             CfUser cfUser = cfService.selectUser(sysUser.getHandle());
             if(cfUser != null) {
@@ -76,6 +77,7 @@ public class AcNumController {
 
         for(SysUser sysUser : luoguUserList) {
             Map<String, Object> userMap = new HashMap<>();
+            if(sysUser.getLgid() == null) continue;
 
             LuoguUser luoguUser = luoguService.selectUserByLgid(sysUser.getLgid());
             if(luoguUser != null) {
@@ -104,6 +106,7 @@ public class AcNumController {
 
         for(SysUser sysUser : VjUserList) {
             Map<String, Object> userMap = new HashMap<>();
+            if(sysUser.getVjName() == null) continue;
 
             VjUser vjUser = vjService.selectUserByName(sysUser.getVjName());
             if(vjUser != null) {

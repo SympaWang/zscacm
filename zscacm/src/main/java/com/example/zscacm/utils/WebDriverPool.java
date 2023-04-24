@@ -2,6 +2,7 @@ package com.example.zscacm.utils;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
@@ -60,10 +61,14 @@ class WebDriverPool {
 		}
 		sConfig.load(new FileReader(configFile));
 
+		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--remote-allow-origins=*");
+
 		// Prepare capabilities
 		sCaps = new DesiredCapabilities();
 		sCaps.setJavascriptEnabled(true);
 		sCaps.setCapability("takesScreenshot", false);
+		sCaps.setCapability(ChromeOptions.CAPABILITY, options);
 
 		String driver = sConfig.getProperty("driver", DRIVER_CHROME);
 
@@ -71,6 +76,8 @@ class WebDriverPool {
 		cliArgsCap.add("--web-security=false");
 		cliArgsCap.add("--ssl-protocol=any");
 		cliArgsCap.add("--ignore-ssl-errors=true");
+		cliArgsCap.add("--remote-allow-origins=*");
+
 
 		// Start appropriate Driver
 		if (driver.equals(DRIVER_FIREFOX)) {

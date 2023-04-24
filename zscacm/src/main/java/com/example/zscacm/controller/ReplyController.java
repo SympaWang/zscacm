@@ -47,6 +47,7 @@ public class ReplyController {
 
                 SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 map.put("createTime", f.format(reply.getCreateTime()));
+                map.put("fromId", reply.getFromId());
                 map.put("comment", reply.getContext());
 
                 map.put("name", userService.selectNameById(reply.getFromId()));

@@ -1,6 +1,7 @@
 package com.example.zscacm.controller;
 
 import com.example.zscacm.entity.CfUserContest;
+import com.example.zscacm.entity.SysUser;
 import com.example.zscacm.service.CfService;
 import com.example.zscacm.service.UserService;
 import com.example.zscacm.utils.ResponseResult;
@@ -83,5 +84,53 @@ public class RatingController {
 
         return new ResponseResult(200, "查询成功", contests);
 
+    }
+
+    @GetMapping("/userRating")
+    public ResponseResult getUserRatings(@RequestParam(value = "grade", required = false) Integer grade) {
+
+        List<SysUser> userList;
+        if(grade == null) {
+            userList = userService.selectUser();
+        } else {
+            userList = userService.selectUserByGrade(grade);
+        }
+
+        Map<String, Object> resultMap = new HashMap<>();
+        List<Map<String, Object>> result = new ArrayList<>();
+        List<String> users = new ArrayList<>();
+
+        for(SysUser user : userList) {
+
+            users.add(user.getUsername());
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", user.getUsername());
+            map.put("type", "line");
+            map.put("symbolSize", 8);
+
+            List<Map<String, Object>> data = new ArrayList<>();
+
+            List<CfUserContest> contestList = cfService.selectUserContestsByHandle(user.getHandle());
+            for(CfUserContest contest : contestList) {
+                Map<String, Object> contestMap = new HashMap<>();
+                String contestName = cfService.selectContestNameById(contest.getContestId());
+                contestMap.put("name", contestName);
+                List<Object> value = new ArrayList<>();
+                SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+                String ratingTime = f.format(contest.   getRatingTime());
+                value.add(ratingTime);
+                value.add(contest.getNewRating());
+                contestMap.put("value", value);
+                data.add(contestMap);
+            }
+            map.put("data", data);
+            result.add(map);
+        }
+
+        resultMap.put("users", users);
+        resultMap.put("result", result);
+
+        return new ResponseResult(200, "查询成功", resultMap);
     }
 }
