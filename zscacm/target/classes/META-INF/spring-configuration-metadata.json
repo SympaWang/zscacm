@@ -1,0 +1,11 @@
+{
+  "groups": [
+    {
+      "name": "cos",
+      "type": "com.example.zscacm.utils.CosPropertiesConstantsUtils",
+      "sourceType": "com.example.zscacm.utils.CosPropertiesConstantsUtils"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}
