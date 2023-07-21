@@ -3,9 +3,9 @@ package com.example.zscacm.task;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.example.zscacm.entity.Attendance;
+import com.example.zscacm.entity.DailySolve;
 import com.example.zscacm.entity.SysUser;
-import com.example.zscacm.service.AttendanceService;
-import com.example.zscacm.service.UserService;
+import com.example.zscacm.service.*;
 import okhttp3.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,19 @@ public class UserTask {
     private UserService userService;
 
     @Resource
-    AttendanceService attendanceService;
+    private AttendanceService attendanceService;
+
+    @Resource
+    private VjService vjService;
+
+    @Resource
+    private LuoguService luoguService;
+
+    @Resource
+    private CfService cfService;
+
+    @Resource
+    private DailySolveService dailySolveService;
 
     @Scheduled(cron = "0 0 22 * * ? ")
     public void attendanceTask() {
@@ -115,8 +127,41 @@ public class UserTask {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
 
+    @Scheduled(cron = "0 0 23 * * ? ")
+    public void DailySolveTask() {
+        Date date = new Date();
+        List<SysUser> userList = userService.selectUser();
+
+        for(SysUser user : userList) {
+            Integer uid = user.getId();
+            String handle = user.getHandle();
+            String vjName = user.getVjName();
+            Integer lgid = user.getLgid();
+
+            int cfNum = 0;
+            int lgNum = 0;
+            int vjNum = 0;
+            if(handle != null) {
+                cfNum = cfService.selectUser(handle).getSolvedNum();
+            }
+            if(lgid != null) {
+                lgNum = luoguService.selectTotalProblemByLgid(lgid);
+            }
+            if(vjName != null) {
+                vjNum = vjService.selectTotalProblemByName(vjName);
+            }
+            int totalNum = cfNum + lgNum + vjNum;
+
+            DailySolve dailySolve = DailySolve.builder()
+                    .uid(uid).solveNum(totalNum).date(date).build();
+            dailySolveService.solveRecord(dailySolve);
         }
 
+
+
     }
+
 }
